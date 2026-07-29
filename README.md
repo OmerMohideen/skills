@@ -14,6 +14,17 @@ Pick the skills you want for Claude Code, Codex, Gemini, Cursor, Windsurf, Cline
 
 ## Skills
 
+### `spec-pot`
+
+Keeps specs, design docs, API contracts, and ADRs aligned with the code they describe. Finds the spec surface, extracts checkable claims, diffs them against code by gap type (wiring/navigation, contracts, acceptance criteria, test coverage, logic/UX) using git history to narrow the search, then resolves every drift found - updates the stale spec, fixes the drifted code, or flags an ambiguous conflict. Checks fixes against the repo's stated architectural rules first, and folds resolved per-feature spec docs into a canonical doc instead of letting them pile up.
+
+Use when you want:
+
+- drift between docs/specs and code caught and fixed in the same pass, not deferred
+- a spec you can actually trust before relying on its description of current behavior
+- per-feature spec docs consolidated into one canonical doc instead of piling up unstatused
+
+Pairs with `to-okf`: run `spec-pot` first to fix drift, then `to-okf` to capture the now-correct state into the bundle.
 
 ### `to-okf`
 

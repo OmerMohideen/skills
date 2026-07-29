@@ -36,16 +36,7 @@ Use when you want:
 - a structured map of modules, APIs, data models, and decisions that lives in git
 - a refresh pass that keeps the bundle in sync as the code evolves
 
-Auto-refresh via git hooks: once `okf/` exists, `npm run okf:hook:install` wires `post-commit`/`post-checkout` hooks that call `claude -p` to refresh the bundle after any commit touching non-`okf/` files, then run `npm run verify:okf` and auto-commit only if conformant (`chore: auto-refresh okf bundle`). `npm run okf:hook:status` / `okf:hook:uninstall` to check or remove.
-
-<!-- Add one ### section per skill here as you create them. -->
-
-## Adding a skill
-
-1. Copy `skills/example-skill/` to `skills/<skill-name>/`.
-2. Rewrite `SKILL.md`: frontmatter (`name`, `description`) plus the body. Long reference material goes in `references/` and gets linked from `SKILL.md`.
-3. Rewrite the skill's `README.md` for humans, and add a `### <skill-name>` section above.
-4. Check everything:
+Auto-refresh via git hooks: say "install the okf hook" and Claude writes `post-commit`/`post-checkout` directly - no scripts or `package.json` entries needed, portable to any repo the skill is installed on. They call `claude -p` to refresh the bundle after any commit touching non-`okf/` files, then auto-commit only if conformant (`chore: auto-refresh okf bundle`). "check the okf hook" / "remove the okf hook" for status/uninstall.
 
 ```bash
 npm run verify   # validates frontmatter across all skills

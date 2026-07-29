@@ -4,10 +4,6 @@
   "type": "module",
   "scripts": {
     "list": "node scripts/list-skills.mjs",
-    "verify": "node scripts/verify-skills.mjs",
-    "verify:okf": "node scripts/verify-okf.mjs",
-    "okf:hook:install": "node scripts/okf-hook.mjs install",
-    "okf:hook:uninstall": "node scripts/okf-hook.mjs uninstall",
-    "okf:hook:status": "node scripts/okf-hook.mjs status"
+    "verify": "node scripts/verify-skills.mjs"
   }
 }

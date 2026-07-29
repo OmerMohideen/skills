@@ -82,6 +82,32 @@ The full field list, conformance rules, suggested `type` values for codebases, a
 - Update affected concepts (bump `timestamp`), mint new ones, and mark removed ones as `**Deprecation**` entries in the log rather than deleting them silently.
 - Append dated `**Update**` entries to `log.md`. Never rewrite log history.
 
+### 8. Auto-refresh hook (optional)
+
+Triggers: "install the okf hook", "auto-refresh okf on commit", "keep okf in sync automatically".
+
+Wires `git` hooks that call this skill's refresh mode after every commit, so the bundle can't drift silently. No scripts or `package.json` entries needed - just write these files directly with Bash, since they only need to exist locally in `.git/hooks/`:
+
+**Install** - write both files below to `.git/hooks/post-commit` and `.git/hooks/post-checkout`, then `chmod +x` both:
+
+```sh
+#!/bin/sh
+# okf-hook: managed by to-okf skill
+[ -d "okf" ] || exit 0
+[ "$(git log -1 --format=%s)" = "chore: auto-refresh okf bundle" ] && exit 0
+CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD | grep -v '^okf/')
+[ -z "$CHANGED" ] && exit 0
+claude -p "Refresh the okf/ bundle for this repo using the to-okf skill's refresh mode (step 7), touching only files under okf/. Then run the skill's step 6 conformance checks against the result. If conformant, stage okf/ and commit with message 'chore: auto-refresh okf bundle'. If not conformant, fix it until it is before committing - never commit a non-conformant bundle." &
+```
+
+- Skip a hook if a file already exists at that path without the `# okf-hook:` marker comment - don't overwrite a hook that isn't ours; tell the user to remove it manually first.
+- Guard against recursion (skip when `HEAD`'s message is already the auto-commit message) and against firing when nothing outside `okf/` changed.
+- No separate verify script or step needed - conformance checking and the commit gate both happen inside the same `claude -p` call, per skill step 6, so the hook has no dependency beyond `claude` on PATH.
+
+**Status** - report whether each of `.git/hooks/post-commit` / `post-checkout` exists and contains the `# okf-hook:` marker.
+
+**Uninstall** - delete any of those two files that contain the marker; leave unmarked hooks alone.
+
 ## Common mistakes
 
 - **Dumping code into concepts**: the bundle rots within a week. Link to `resource` paths instead.

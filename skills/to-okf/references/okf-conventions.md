@@ -1,4 +1,4 @@
-# OKF v0.1 conventions cheat sheet
+# OKF v0.2 conventions cheat sheet
 
 Condensed from the [official spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md). When in doubt, the spec wins.
 
@@ -20,13 +20,27 @@ A directory of markdown files. **Concept** = one `.md` file; **concept ID** = it
 | `description` | Recommended | One sentence. Feeds index entries and search snippets. |
 | `resource` | Recommended | URI or repo-relative path identifying the underlying asset. Omit for abstract concepts. |
 | `tags` | Optional | YAML list of short strings. |
-| `timestamp` | Optional | ISO 8601 of last meaningful change. Bump on refresh. |
+| `sources` | Optional | Provenance: list of `{ id, resource, title, author, usage_count, last_modified }` the concept derives from. `resource` required per entry; sibling `usage_window: { from, to }` frames the counts. |
+| `generated` | Optional | `{ by: <actor>, at: <ISO 8601> }`. Replaces v0.1 `timestamp`; records last meaningful change. |
+| `verified` | Optional | List of `{ by: <actor>, at: <ISO 8601> }` confirmations (a bare mapping = one-element list). Drives trust tiers. |
+| `status` | Optional | `draft` \| `stable` (default) \| `deprecated`. |
+| `stale_after` | Optional | Absolute `YYYY-MM-DD`; concept is stale when `today >= stale_after`. |
+
+Actors (spec section 7): `<producer>/<version>` (agents/tools), `human:<id>`, `process:<id>`. Consumers key trust tiers off the `human:` prefix.
 
 Producer-defined extra keys are allowed; consumers must not reject them.
 
 ## Body
 
-Free-form markdown, but favor structure (headings, tables, code blocks) over prose. Conventional headings: `# Schema`, `# Examples`, `# Citations` (numbered list of external sources at the bottom).
+Free-form markdown, but favor structure (headings, tables, code blocks) over prose. Conventional headings: `# Schema`, `# Examples`, `# Computation` (for `Attested Computation` concepts, spec section 10). Per-claim attribution uses markdown footnotes whose labels are `sources[].id` keys; consumers join through the matching `sources` entry, not by parsing footnote prose:
+
+```markdown
+The `events_` table is sharded daily as `events_YYYYMMDD`.[^ga4-schema]
+
+[^ga4-schema]: GA4 BigQuery Export schema
+```
+
+Labels are keyed rather than positional so they survive agent rewrites that reorder the `sources` list.
 
 ## Cross-links
 
@@ -43,7 +57,7 @@ Free-form markdown, but favor structure (headings, tables, code blocks) over pro
 * [Subdirectory](subdir/) - what lives there
 ```
 
-Root `index.md` may start with frontmatter containing only `okf_version: "0.1"`.
+Root `index.md` may start with frontmatter containing only `okf_version: "0.2"`.
 
 ## log.md shape
 
@@ -58,16 +72,16 @@ Root `index.md` may start with frontmatter containing only `okf_version: "0.1"`.
 
 Newest first. Append-only.
 
-## Conformance (v0.1)
+## Conformance (v0.2)
 
-A bundle is conformant if: every non-reserved `.md` has parseable frontmatter with a non-empty `type`, and reserved files follow their section 6 and 7 shapes. Everything else is soft guidance.
+A bundle is conformant if: every non-reserved `.md` has parseable frontmatter with a non-empty `type`, and reserved files follow their section 8 and 9 shapes. Consumers must not reject a bundle for missing optional families, unknown types or keys, broken links, or missing `index.md`. When the trust/lifecycle/provenance families are present, follow spec sections 5 through 10 (a bare `verified` mapping is a one-element list; trust tiers derive from `verified`).
 
 ## Suggested `type` values for codebases
 
 Not registered - pick self-explanatory values and stay consistent within a bundle:
 
 | Type | Use for |
-| ---- | ------- |
+| ---- | ------ |
 | `Repository` | The `overview.md` concept: what the system is, how to run it |
 | `Module` | Top-level package/module with its public interface |
 | `Service` | Independently deployable/runnable unit |
@@ -78,6 +92,7 @@ Not registered - pick self-explanatory values and stay consistent within a bundl
 | `Decision` | One ADR |
 | `Runbook` | Operational procedure (deploy, rollback, on-call) |
 | `Config` | Configuration surface and env vars |
+| `Attested Computation` | A sanctioned way to compute a value, with `runtime`, `parameters`, `executor`, `attester` (spec section 10) |
 
 ## Example concept
 
@@ -88,7 +103,17 @@ title: Auth
 description: Session issuance and verification for all API traffic.
 resource: src/auth/
 tags: [security, api]
-timestamp: 2026-07-18T10:00:00Z
+status: stable
+generated: { by: to-okf/okf-v0.2, at: 2026-07-18T10:00:00Z }
+verified: { by: human:you, at: 2026-07-19T09:00:00Z }
+stale_after: 2026-10-18
+sources:
+  - id: auth-redesign
+    resource: specs/auth-redesign.md
+    title: Spec - auth redesign
+  - id: adr-0003
+    resource: decisions/0003-jwt.md
+    title: ADR 0003 - JWT over sessions
 ---
 
 Issues JWT sessions at login and verifies them on every request.
@@ -106,10 +131,11 @@ Consumed by [api-server](/modules/api-server.md); configured via
 curl -X POST localhost:3000/auth/login -d '{"user":"a","pass":"b"}'
 ```
 
-# Citations
+JWT signing follows the redesign spec[^auth-redesign] and the
+ADR's migration path.[^adr-0003]
 
-[1] [Spec: auth redesign](/specs/auth-redesign.md)
-[2] [ADR 0003: JWT over sessions](/decisions/0003-jwt.md)
+[^auth-redesign]: Spec - auth redesign
+[^adr-0003]: ADR 0003 - JWT over sessions
 ```
 
 ## Consuming a bundle

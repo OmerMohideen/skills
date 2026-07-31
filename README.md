@@ -28,7 +28,7 @@ Pairs with `to-okf`: run `spec-pot` first to fix drift, then `to-okf` to capture
 
 ### `to-okf`
 
-Turns a codebase into an [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) bundle. Reads all existing specs first (CONTEXT.md, specs/, docs/, ADRs), maps the skeleton, then writes `okf/` - small concept docs with YAML frontmatter, per-directory `index.md` files for progressive disclosure, cross-links, and a `log.md`. Re-run refreshes the bundle after code changes.
+Turns a codebase into an [OKF v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) bundle. Reads all existing specs first (CONTEXT.md, specs/, docs/, ADRs), maps the skeleton, then writes `okf/` - small concept docs with YAML frontmatter (including provenance/trust/lifecycle fields), per-directory `index.md` files for progressive disclosure, cross-links, and a `log.md`. Re-run refreshes the bundle after code changes.
 
 Use when you want:
 

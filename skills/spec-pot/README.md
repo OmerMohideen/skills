@@ -9,6 +9,7 @@ Keeps specs, design docs, API contracts, and ADRs aligned with the code they des
 3. **Diffs claims against code**, sorted by gap type (wiring/navigation, contracts, acceptance criteria, test coverage, logic/UX), using git history to narrow the search instead of eyeballing. Confirms fixes behaviorally, not just in text.
 4. **Resolves every drift found** - updates the stale spec, fixes the drifted code, or flags an ambiguous conflict to the user - checked first against the repo's stated architectural rules (CLAUDE.md/AGENTS.md or equivalent).
 5. **Leaves a trail** - records non-trivial spec updates in an existing changelog/ADR convention, and folds resolved per-feature spec docs into a canonical doc rather than letting them pile up as equals.
+6. **Re-checks before declaring done** - re-runs the claim diff on the claims it touched and confirms zero drift remains; anything still disagreeing goes back to resolution.
 
 Every run ends resolved or explicitly flagged - never a silent "noted for later."
 

@@ -61,6 +61,10 @@ If the repo has a changelog/ADR convention, record non-trivial spec updates ther
 
 If the repo keeps one spec doc per feature/PR (e.g. `specs/006-invoice-settings/`), those pile up and none of them answer "how does this module work right now." Don't leave every fixed doc looking equally current - if a canonical/module-level doc exists, fold the resolved delta into it and mark the feature doc historical (same idea as an ADR moving to `superseded`); if no canonical doc exists yet, don't invent one uninvited, just say so. When folding a delta in, leave a short source marker (e.g. `[from: specs/006-invoice-settings]`) so the merge stays traceable back to what introduced it.
 
+### 6. Re-check before declaring done
+
+"Resolved" is a state, not a promise. Before the run ends, re-run the diff from step 3 on the claims you touched and confirm each now holds against code - spec text matches actual behavior, wiring is reachable, contracts match real request/response. This is a confirmation pass on what you changed, not a fresh audit of the whole surface: don't re-scan everything, just re-verify the claims you resolved. If any still disagrees, it isn't resolved yet - go back to step 4 instead of calling the run done.
+
 ## Quick reference
 
 | Situation | Do this |
@@ -69,6 +73,7 @@ If the repo keeps one spec doc per feature/PR (e.g. `specs/006-invoice-settings/
 | Spec describes a default that code no longer uses | Fix whichever is wrong; never leave both standing |
 | Can't tell which side is intended behavior | Ask the user - name the exact lines in conflict |
 | No spec exists yet for changed behavior | Out of scope - that's spec authoring, not drift-fixing |
+| Re-checked a resolved claim and it still disagrees | Not done yet - back to step 4 until the re-diff shows zero drift |
 
 ## Common mistakes
 
@@ -77,4 +82,5 @@ If the repo keeps one spec doc per feature/PR (e.g. `specs/006-invoice-settings/
 - **Rewriting the whole doc** - touch only the drifted claims, keep everything else intact
 - **Silently picking a side on ambiguous conflicts** - when intent is unclear, ask rather than assume
 - **Fixing the doc text but not checking the feature actually works** - a route/nav fix isn't done until it's reachable; a contract fix isn't done until checked against the real request/response
+- **Declaring the run resolved without a re-check** - "resolved" means re-running the claim diff on what you touched and seeing zero disagreement, not assuming your edits landed correctly
 - **Letting per-feature spec docs pile up as equals** - stale ones with no status read as current; fold resolved ones into the canonical doc or mark them historical

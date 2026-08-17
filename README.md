@@ -36,7 +36,7 @@ Use when you want:
 - a structured map of modules, APIs, data models, and decisions that lives in git
 - a refresh pass that keeps the bundle in sync as the code evolves
 
-Auto-refresh via git hooks: say "install the okf hook" and Claude writes `post-commit`/`post-checkout` directly - no scripts or `package.json` entries needed, portable to any repo the skill is installed on. They call `claude -p` to refresh the bundle after any commit touching non-`okf/` files, then auto-commit only if conformant (`chore: auto-refresh okf bundle`). "check the okf hook" / "remove the okf hook" for status/uninstall.
+Kept in sync by trigger, not machinery: the skill fires after an AI agent makes changes to a repo that has an `okf/` bundle, and the refreshed bundle lands in the same change. No hooks, scripts, or CI to install.
 
 ```bash
 npm run verify   # validates frontmatter across all skills

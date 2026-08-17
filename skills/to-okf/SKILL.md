@@ -1,6 +1,6 @@
 ---
 name: to-okf
-description: Use when asked to map, document, or "OKF-ify" a codebase, build an agent-readable knowledge base of a repo, generate an OKF bundle, or refresh an existing bundle after code changes.
+description: Use when asked to map, document, or "OKF-ify" a codebase, build an agent-readable knowledge base of a repo, generate an OKF bundle, refresh an existing bundle after code changes, or after an AI agent has made changes to a repo that has an okf/ bundle.
 ---
 
 # to-okf
@@ -82,31 +82,17 @@ The full field list, conformance rules, suggested `type` values for codebases, a
 - Update affected concepts (bump `generated.at` and add a `verified` entry if you re-confirmed content), mint new ones, and mark removed ones as `**Deprecation**` entries in the log rather than deleting them silently. If the existing bundle is v0.1, migrate every v0.1 concept in it to v0.2, not just the ones you're updating: `timestamp` → `generated.at` (leave no `timestamp` fields behind), `# Citations` → `sources` frontmatter with keyed footnotes per spec section 5.1.
 - Append dated `**Update**` entries to `log.md`. Never rewrite log history.
 
-### 8. Auto-refresh hook (optional)
+### 8. Refresh on agent changes
 
-Triggers: "install the okf hook", "auto-refresh okf on commit", "keep okf in sync automatically".
+The bundle stays current because this skill triggers when an AI agent makes changes to a repo that has an `okf/` bundle - not via hooks, scripts, or CI. Nothing is installed or runs in the background; drift is caught in the same pass as the change that causes it.
 
-Wires `git` hooks that call this skill's refresh mode after every commit, so the bundle can't drift silently. No scripts or `package.json` entries needed - just write these files directly with Bash, since they only need to exist locally in `.git/hooks/`:
+When the skill fires for this reason, finish the refresh before calling the change done:
 
-**Install** - write both files below to `.git/hooks/post-commit` and `.git/hooks/post-checkout`, then `chmod +x` both:
+- Run refresh mode (step 7) now, while you're already mid-change: diff the bundle against the code, update affected concepts, mint new ones, and log removals as `**Deprecation**` entries.
+- Verify conformance (step 6) on the result.
+- Commit the refreshed bundle in the same change, not as a separate follow-up.
 
-```sh
-#!/bin/sh
-# okf-hook: managed by to-okf skill
-[ -d "okf" ] || exit 0
-[ "$(git log -1 --format=%s)" = "chore: auto-refresh okf bundle" ] && exit 0
-CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD | grep -v '^okf/')
-[ -z "$CHANGED" ] && exit 0
-claude -p "Refresh the okf/ bundle for this repo using the to-okf skill's refresh mode (step 7), touching only files under okf/. Then run the skill's step 6 conformance checks against the result. If conformant, stage okf/ and commit with message 'chore: auto-refresh okf bundle'. If not conformant, fix it until it is before committing - never commit a non-conformant bundle." &
-```
-
-- Skip a hook if a file already exists at that path without the `# okf-hook:` marker comment - don't overwrite a hook that isn't ours; tell the user to remove it manually first.
-- Guard against recursion (skip when `HEAD`'s message is already the auto-commit message) and against firing when nothing outside `okf/` changed.
-- No separate verify script or step needed - conformance checking and the commit gate both happen inside the same `claude -p` call, per skill step 6, so the hook has no dependency beyond `claude` on PATH.
-
-**Status** - report whether each of `.git/hooks/post-commit` / `post-checkout` exists and contains the `# okf-hook:` marker.
-
-**Uninstall** - delete any of those two files that contain the marker; leave unmarked hooks alone.
+No `okf/` bundle in the repo? This trigger doesn't apply - creating one is the normal mapping workflow (steps 1-5).
 
 ## Common mistakes
 

@@ -19,7 +19,7 @@ The result is an agent-readable knowledge base that lives in git next to the cod
 
 Run it at the root of the repo you want mapped. Re-run after large refactors to refresh the bundle.
 
-To auto-refresh on every commit instead of re-running manually, say "install the okf hook" - Claude writes `.git/hooks/post-commit` / `post-checkout` directly, no scripts or `package.json` entries required. "check the okf hook" / "remove the okf hook" for status/uninstall.
+Kept in sync by trigger, not machinery: the skill fires after an AI agent makes changes to a repo that has an `okf/` bundle, and the refreshed bundle lands in the same change. No hooks, scripts, or CI to install.
 
 ## See also
 

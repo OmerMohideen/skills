@@ -135,6 +135,8 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 No PR opens until every visual change has a before screenshot and an after screenshot on the image branch. Capture befores first, from the base ref, before writing the PR body. A body with after-only screenshots never opens. Non-visual changes (aria labels, live regions, summaries) need a code assertion or DOM check each, listed in the body.
 
+One image branch per repo, always named exactly `pr-images`. Never derive the name from the feature branch (`pr-images-<feature>` is wrong). Create it as an orphan branch (no shared history, never merged) if it does not exist. Store shots under `<number>/` per pull request (bare PR number, e.g. `1/`), one rerun-safe name per target (same PR plus target plus kind maps to the same path, overwrite in place).
+
 ### Pre-open checklist - fill this before the PR opens
 
 Copy this table into the run notes. Every cell needs a value. An empty cell blocks the PR.
@@ -195,7 +197,13 @@ Check for a repo PR template first (`.github/PULL_REQUEST_TEMPLATE.md`, `docs/pu
 <optional ramifications>
 ```
 
-Backend-only PRs use the same shape with test/console output instead of images. Do not post extra triage, setup, or "pipeline completed" comments. Do not paste raw pre-commit hook output. Omit passing gates entirely. State a failing gate in one or two sentences only when it changes the verdict.
+Backend-only PRs use the same shape with test/console output instead of images. A passing-tests table alone is not enough. Add at least one visual:
+
+- Before/after request/response pairs (real payloads with secrets redacted). Shows what the caller sees change.
+- A Mermaid sequence or flow diagram of the changed path. Shows what runs in what order. Use it only when the change alters call order, branching, retries, or cross-service flow. Shape-only changes (added field, renamed key, fixed status code) skip the diagram. A diagram that restates the diff is decoration. Put a bold caption naming the change directly above each diagram, so multi-diagram bodies stay matched to their changes. Wrap each diagram in a `<details>` section like screenshots, with the caption as the summary.
+- Numbers before and after: test counts, coverage delta, latency or query time. One small table, same metric both sides.
+
+Pick the visual that proves the behavior change, not the one that decorates the body. Do not post extra triage, setup, or "pipeline completed" comments. Do not paste raw pre-commit hook output. Omit passing gates entirely. State a failing gate in one or two sentences only when it changes the verdict.
 
 ## Accessibility gate
 
@@ -209,6 +217,16 @@ Walk every new dialog with the keyboard only:
 - The dialog has `role="dialog"`, `aria-modal="true"`, and an accessible name.
 
 A dialog that fails any of these fails the gate. State the gate and the result in the PR body.
+
+## Authentication
+
+Some routes sit behind login. A screenshot of a sign-in wall is not evidence for the page behind it.
+
+- Detect it: redirect to sign-in, a login form instead of content, or auth errors in the console.
+- Ask the user for credentials. Use a test account, never a personal one. Read secrets from environment variables. Never write them into specs, logs, screenshots, or the PR body. Never commit them.
+- If the account uses MFA/2FA with TOTP: ask the user for the TOTP secret (the seed, not a one-time code). Generate a fresh code from the secret at login time and submit it at once. Codes expire in 30 seconds. Never ask for, log, or reuse single codes across runs.
+- Log in once per run. Save the session (`storageState`) and reuse it for all screenshots. Log in again only when the session expires.
+- Keep secrets out of pixels: mask password fields, tokens, and personal data in every screenshot.
 
 ## Language - ASD-STE100
 Write all prose in ASD-STE100 Simplified Technical English:

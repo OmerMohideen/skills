@@ -38,6 +38,16 @@ Use when you want:
 
 Kept in sync by trigger, not machinery: the skill fires after an AI agent makes changes to a repo that has an `okf/` bundle, and the refreshed bundle lands in the same change. No hooks, scripts, or CI to install.
 
+### `pr`
+
+Writes reviewable PR bodies in ASD-STE100 Simplified Technical English: visual Summary sketch, concrete Evidence, explicit Merge Danger. Frontend changes always ship before/after/diff images - via the repo's visual-regression pipeline when one exists, otherwise manual base-vs-head screenshots at the same route/viewport/scheme. Posts exactly one body, triaged per intentional/regression/not-sure.
+
+Use when you want:
+
+- a PR description reviewers can merge without guessing what changed
+- before/after screenshots for any UI change, with diff triage
+- an explicit one-way/two-way door and blast-radius call on every merge
+
 ```bash
 npm run verify   # validates frontmatter across all skills
 npm run list     # prints every skill with its description

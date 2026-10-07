@@ -42,6 +42,8 @@ for (const entry of entries) {
 
   if (!name) fail(`${entry.name}: missing name`);
   if (!description && !blockDescription) fail(`${entry.name}: missing description`);
+  if (description && !/^use when\b/i.test(description))
+    fail(`${entry.name}: description must start with "Use when"`);
 
   if (name) {
     if (seenNames.has(name)) {

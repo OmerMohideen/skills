@@ -135,6 +135,8 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 No PR opens until every visual change has a before screenshot and an after screenshot on the image branch. Capture befores first, from the base ref, before writing the PR body. A body with after-only screenshots never opens. Non-visual changes (aria labels, live regions, summaries) need a code assertion or DOM check each, listed in the body.
 
+One image branch per repo, always named exactly `pr-images`. Never derive the name from the feature branch (`pr-images-<feature>` is wrong). Create it as an orphan branch (no shared history, never merged) if it does not exist. Store shots under `pr-<number>/` per pull request, one rerun-safe name per target (same PR plus target plus kind maps to the same path, overwrite in place).
+
 ### Pre-open checklist - fill this before the PR opens
 
 Copy this table into the run notes. Every cell needs a value. An empty cell blocks the PR.

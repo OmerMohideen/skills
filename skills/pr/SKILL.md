@@ -210,6 +210,16 @@ Walk every new dialog with the keyboard only:
 
 A dialog that fails any of these fails the gate. State the gate and the result in the PR body.
 
+## Authentication
+
+Some routes sit behind login. A screenshot of a sign-in wall is not evidence for the page behind it.
+
+- Detect it: redirect to sign-in, a login form instead of content, or auth errors in the console.
+- Ask the user for credentials. Use a test account, never a personal one. Read secrets from environment variables. Never write them into specs, logs, screenshots, or the PR body. Never commit them.
+- If the account uses MFA/2FA with TOTP: ask the user for the TOTP secret (the seed, not a one-time code). Generate a fresh code at login time with `oathtool --base32 --totp "$TOTP_SECRET"` and submit it at once. Codes expire in 30 seconds. Never ask for, log, or reuse single codes across runs.
+- Log in once per run. Save the session (`storageState`) and reuse it for all screenshots. Log in again only when the session expires.
+- Keep secrets out of pixels: mask password fields, tokens, and personal data in every screenshot.
+
 ## Language - ASD-STE100
 Write all prose in ASD-STE100 Simplified Technical English:
 

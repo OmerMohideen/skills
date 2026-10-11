@@ -48,6 +48,16 @@ Use when you want:
 - before/after screenshots for any UI change, with diff triage
 - an explicit one-way/two-way door and blast-radius call on every merge
 
+### `axe`
+
+Checks and fixes web accessibility with real scan evidence: free `axe-core` via Playwright, no keys or accounts. Static suspect prefilter, then Playwright scan as the only verdict, one violation class fixed at a time with a re-scan before claiming done. Covers local components/routes and live-URL audits at WCAG 2.2 A+AA.
+
+Use when you want:
+
+- an a11y scan of changed UI with ordered, fixable findings
+- a WCAG violation fixed with re-scan evidence, not advice
+- a live-URL audit with desktop + mobile viewports
+
 ```bash
 npm run verify   # validates frontmatter across all skills
 npm run list     # prints every skill with its description
